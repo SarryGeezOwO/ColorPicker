@@ -7,7 +7,7 @@ nice looking UI.
 > but it works very well for now. All it needs is a few refactors
 > here and there.
 
-> [!WARNING]
+> [!CAUTION]
 > Be aware not everything is handled with exceptions yet, so there are some cases like
 > Inputting a number above 300 on one of the RGB text fields will cause an error
 
