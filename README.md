@@ -1,10 +1,15 @@
 # ColorPicker
-A java Swing component for picking colors with very
+A Java Swing component for picking colors with very
 nice looking UI.
 
-> Work in progress, currently ass of an implementation
-> but works very well for now, just need some few refactors
+> [!NOTE]
+> Work in progress, current ass of an implementation
+> but it works very well for now. All it needs is a few refactors
 > here and there.
+
+> [!WARNING]
+> Be aware not everything is handled with exceptions yet, so there are some cases like
+> Inputting a number above 300 on one of the RGB text fields will cause an error
 
 ### Preview
 ![img.png](Preview.png)
@@ -30,5 +35,5 @@ void demo() {
 ```
 
 ### Licence
-This repo uses M.I.T licencing, so feel free to go wild
-with this JComponent, though a bit of credit will be nice :) 
+This repo uses M.I.T licensing, so feel free to go wild
+with this JComponent, though,  crediting will be appreciated :) 
