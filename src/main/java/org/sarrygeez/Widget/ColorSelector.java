@@ -4,10 +4,27 @@ import javax.swing.*;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import java.awt.*;
 
+/**
+ * A custom color selector that extends JColorChooser, focusing on the HSV panel.
+ * <p>
+ * This class customizes the JColorChooser by removing unnecessary panels and
+ * components, retaining only the HSV panel. It synchronizes the background color
+ * of the HSV panel with its container's background color. The default preview
+ * panel is removed, and additional components such as sliders, radio buttons,
+ * spinners, labels, and formatted text fields are recursively removed from the
+ * HSV panel to streamline the interface.
+ */
 public class ColorSelector extends JColorChooser {
 
     private AbstractColorChooserPanel hsvPanel;
 
+    /**
+     * Constructs a ColorSelector object that customizes the JColorChooser
+     * by removing unnecessary panels and styling the HSV panel.
+     * The default preview panel is removed, and only the HSV panel is retained
+     * after removing extra components. The background color of the HSV panel
+     * is synchronized with the container's background color.
+     */
     public ColorSelector() {
 
         // Remove the default Preview panel
