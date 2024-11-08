@@ -2,22 +2,11 @@
 A Java Swing component for picking colors with a very
 nice-looking GUI. This component uses [MigLayout](https://github.com/mikaelgrev/miglayout) to position components.
 
-
-> [!NOTE]
-> Work in progress, current ass of an implementation
-> but it works very well for now. All it needs is a few refactors
-> here and there.
->
-> Also, this package is severely lacking in documentation for now so, sorry for that 😔😔
-
-> [!CAUTION]
-> Be aware not everything is handled with exceptions yet, so there are some cases like
-> Inputting a number above 300 on one of the RGB text fields will cause an error
-
 ### Preview
 ![img.png](Preview.png)
 
 ### Usage
+- Java 21 😢
 - <code>ColorPicker</code> has a few constructors to configure the 
 JPanels radius.
 - <code>ColorPicker</code> subclasses JPanel.
@@ -37,8 +26,13 @@ void demo() {
 }
 ```
 
-### Features wanted
-- Documentation and JavaDocs, even the most simplest, will be nice
+### Dependencies
+- Miglayout
+- JUnit (testing)
+
+### Upcoming Updates
+- Maven package
+- Support for older Java versions
 - Eye dropper
 - Color history
 
