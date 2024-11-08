@@ -19,6 +19,11 @@ public class ColorPickerDemo extends JFrame {
                 System.out.println("New Color: " + newColor);
             }
         });
+        picker.setForeground(Color.GRAY);
+        picker.setBorderColor(Color.YELLOW);
+        picker.setBackground(new Color(25,25,35));
+        picker.setTextFieldForeground(Color.WHITE);
+        picker.setTextFieldBackground(new Color(15, 15, 20));
         add(picker, "center");
         setVisible(true);
     }

@@ -12,7 +12,6 @@ public class ColorSelector extends JColorChooser {
 
         // Remove the default Preview panel
         setPreviewPanel(new JPanel());
-        setColor(Color.WHITE);
 
         // Modify each panel existed in the JColorChooser
         AbstractColorChooserPanel[] availablePanels = getChooserPanels();
