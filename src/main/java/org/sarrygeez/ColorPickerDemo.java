@@ -12,18 +12,13 @@ public class ColorPickerDemo extends JFrame {
         initFrame();
 
         ColorPicker picker = new ColorPicker(15);
-        picker.setTextFieldBorder(new EmptyBorder(5, 10, 5, 10));
         picker.addColorPickerListener(new ColorPickerListener() {
             @Override
             public void onColorChanged(Color newColor) {
                 System.out.println("New Color: " + newColor);
             }
         });
-        picker.setForeground(Color.GRAY);
-        picker.setBorderColor(Color.YELLOW);
-        picker.setBackground(new Color(25,25,35));
-        picker.setTextFieldForeground(Color.WHITE);
-        picker.setTextFieldBackground(new Color(15, 15, 20));
+        picker.setTextFieldBorder(new EmptyBorder(5, 10, 5, 10));
         add(picker, "center");
         setVisible(true);
     }
