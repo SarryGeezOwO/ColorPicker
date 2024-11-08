@@ -151,7 +151,7 @@ public class ColorPicker extends RoundedPanel {
                 }
             });
         }
-    }[]
+    }
     private void focusUpdate(FocusEvent e) {
         Map<JTextField, String> fieldToComponentMap = Map.of(
                 inputFields[0], "Hex",
