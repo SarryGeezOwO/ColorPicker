@@ -7,8 +7,10 @@ import org.sarrygeez.Widget.RoundedPanel;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The ColorPicker class extends RoundedPanel and provides a graphical user interface
@@ -117,62 +119,116 @@ public class ColorPicker extends RoundedPanel {
     }
 
     private void initListeners() {
-        alphaSlider.addChangeListener(e -> {
-            Color col = previewPanel.getBackground();
-            previewPanel.setBackground(new Color(
-                    col.getRed(), col.getGreen(), col.getBlue(),
-                    alphaSlider.getValue()
-            ));
+        alphaSlider.addChangeListener(e -> updateAlpha());
+        inputFields[0].addActionListener(e -> updateColorFromHex());
+        inputFields[4].addActionListener(e -> updateColorComponent("Alpha", inputFields[4]));
+        inputFields[1].addActionListener(e -> updateColorComponent("Red", inputFields[1]));
+        inputFields[2].addActionListener(e -> updateColorComponent("Green", inputFields[2]));
+        inputFields[3].addActionListener(e -> updateColorComponent("Blue", inputFields[3]));
+        chooser.getSelectionModel().addChangeListener(evt -> updateColorFromChooser());
 
-            // notify the alpha text field for updates
-            inputFields[4].setText(String.valueOf(alphaSlider.getValue()));
-            for(ColorPickerListener listener : listeners) {
-                listener.onTransparencyChanged(alphaSlider.getValue());
+        // Add focus listeners to each JTextField
+        for (JTextField field : inputFields) {
+            field.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    focusUpdate(e);
+                }
+            });
+
+            // Let Hex Field accept letters
+            if(field.equals(inputFields[0])) {
+                continue;
             }
-        });
 
-        inputFields[0].addActionListener(e -> {
-            Color color = tryGetColor(inputFields[0]);
-            chooser.getSelectionModel().setSelectedColor(color);
-        });
+            field.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    // Consume letters
+                    if(Character.isLetter(e.getKeyChar())) {
+                        e.consume();
+                    }
+                }
+            });
+        }
+    }[]
+    private void focusUpdate(FocusEvent e) {
+        Map<JTextField, String> fieldToComponentMap = Map.of(
+                inputFields[0], "Hex",
+                inputFields[1], "Red",
+                inputFields[2], "Green",
+                inputFields[3], "Blue",
+                inputFields[4], "Alpha"
+        );
 
-        inputFields[4].addActionListener(e -> {
-            Color color = modifyColor(chooser.getColor(), "Alpha", inputFields[4].getText());
-            chooser.getSelectionModel().setSelectedColor(color);
+        JTextField sourceField = (JTextField) e.getSource();
+        String component = fieldToComponentMap.get(sourceField);
 
-            // Notify slider for new updates
+        if ("Hex".equals(component)) {
+            updateColorFromHex();
+        } else if (component != null) {
+            updateColorComponent(component, sourceField);
+        }
+    }
+
+    private void updateAlpha() {
+        Color col = previewPanel.getBackground();
+        previewPanel.setBackground(new Color(
+                col.getRed(), col.getGreen(), col.getBlue(),
+                alphaSlider.getValue()
+        ));
+
+        inputFields[4].setText(String.valueOf(alphaSlider.getValue()));
+        for (ColorPickerListener listener : listeners) {
+            listener.onTransparencyChanged(alphaSlider.getValue());
+        }
+
+        // Always update for case where changeListener doesn't work
+        updateInputFields();
+    }
+
+    // Attempt to update Color Selector from a hex value
+    private void updateColorFromHex() {
+        Color color = tryGetColor(inputFields[0]);
+        chooser.getSelectionModel().setSelectedColor(color);
+
+        // Always update for case where changeListener doesn't work
+        updateInputFields();
+    }
+
+    // update Color Selector based from one of the Input fields
+    private void updateColorComponent(String component, JTextField field) {
+        Color color = modifyColor(chooser.getColor(), component, field.getText());
+        chooser.getSelectionModel().setSelectedColor(color);
+
+        if ("Alpha".equals(component)) {
             int alpha = color.getAlpha();
             alphaSlider.setValue(alpha);
-        });
+        }
 
-        inputFields[1].addActionListener(e -> {
-            Color color = modifyColor(chooser.getColor(), "Red", inputFields[1].getText());
-            chooser.getSelectionModel().setSelectedColor(color);
-        });
+        // Always update for case where changeListener doesn't work
+        updateInputFields();
+    }
 
-        inputFields[2].addActionListener(e -> {
-            Color color = modifyColor(chooser.getColor(), "Green", inputFields[2].getText());
-            chooser.getSelectionModel().setSelectedColor(color);
-        });
+    // Update all Input fields
+    private void updateInputFields() {
+        Color newColor = chooser.getColor();
+        previewPanel.setBackground(new Color(
+                newColor.getRed(), newColor.getGreen(), newColor.getBlue(),
+                alphaSlider.getValue()
+        ));
+        inputFields[1].setText(String.valueOf(newColor.getRed()));
+        inputFields[2].setText(String.valueOf(newColor.getGreen()));
+        inputFields[3].setText(String.valueOf(newColor.getBlue()));
+        inputFields[0].setText(String.format("#%06X", newColor.getRGB() & 0xFFFFFF));
+    }
 
-        inputFields[3].addActionListener(e -> {
-            Color color = modifyColor(chooser.getColor(), "Blue", inputFields[3].getText());
-            chooser.getSelectionModel().setSelectedColor(color);
-        });
-
-        chooser.getSelectionModel().addChangeListener(evt -> {
-            Color newColor = chooser.getColor();
-            previewPanel.setBackground(newColor);
-            inputFields[1].setText(String.valueOf(newColor.getRed()));
-            inputFields[2].setText(String.valueOf(newColor.getGreen()));
-            inputFields[3].setText(String.valueOf(newColor.getBlue()));
-
-            inputFields[0].setText(String.format("#%06X", newColor.getRGB() & 0xFFFFFF));
-            for(ColorPickerListener listener : listeners) {
-                listener.onColorChanged(newColor);
-            }
-
-        });
+    // Update all Input fields + Notify listeners
+    private void updateColorFromChooser() {
+        updateInputFields();
+        for (ColorPickerListener listener : listeners) {
+            listener.onColorChanged(chooser.getColor());
+        }
     }
 
     private void propertyChanged(JLabel ... labels) {
@@ -187,6 +243,12 @@ public class ColorPicker extends RoundedPanel {
         });
     }
 
+    /**
+     * Attempts to return a Color object referencing from the JTextField string value,
+     * returns <code style="color:yellow;">Color.WHITE</code> when decoding fails
+     * @param field JTextField to refer to when creating the Color object
+     * @return a Color object represents the JTextField string value
+     */
     private Color tryGetColor(JTextField field) {
         Color color;
         try {
@@ -277,14 +339,15 @@ public class ColorPicker extends RoundedPanel {
     // =========================== Public static Functions ================================ //
     // ==================================================================================== //
 
+
     /**
-     * Modifies the specified component of the given color based on the target and value.
-     * If the value cannot be parsed as an integer, defaults to 255.
+     * Modifies a specified component of the given color based on the target and value provided.
+     * If the value cannot be parsed as an integer, it defaults to 255.
      *
      * @param originalColor the original Color to be modified.
      * @param target the color component to modify ("Red", "Green", "Blue", or "Alpha").
-     * @param value the new value for the specified component as a String.
-     * @return a new Color object with the modified component, or white if the target is invalid.
+     * @param value the new value for the specified color component as a String.
+     * @return a new Color object with the modified component, or <code>Color.WHITE</code> if the target is invalid.
      */
     public static Color modifyColor(Color originalColor, String target, String value) {
         int newValue;
@@ -298,20 +361,25 @@ public class ColorPicker extends RoundedPanel {
     }
 
     /**
-     * Modifies the specified component of the given color based on the target and value.
-     * If the value cannot be parsed as an integer, defaults to 255.
+     * Modifies a specific component of the given color based on the target parameter.
+     * The target can be "Red", "Green", "Blue", or "Alpha", and the new value is clamped
+     * between 0 and 255. If the target is invalid, the method returns <code>Color.WHITE</code>.
      *
-     * @param originalColor the original Color to be modified.
+     * @param originalColor the original Color object to be modified.
      * @param target the color component to modify ("Red", "Green", "Blue", or "Alpha").
-     * @param newValue the new value for the specified component.
-     * @return a new Color object with the modified component, or white if the target is invalid.
+     * @param newValue the new integer value for the specified color component.
+     * @return a new Color object with the modified component, or <code>Color.WHITE</code> if the target is invalid.
      */
     public static Color modifyColor(Color originalColor, String target, int newValue) {
+        // Check integer value if it's ranging from 0-255
+        // If not, simply clamp it
+        int clampedValue = Math.clamp(newValue, 0, 255);
+
         return switch (target) {
-            case "Red" -> new Color(newValue, originalColor.getGreen(), originalColor.getBlue());
-            case "Green" -> new Color(originalColor.getRed(), newValue, originalColor.getBlue());
-            case "Blue" -> new Color(originalColor.getRed(), originalColor.getGreen(), newValue);
-            case "Alpha" -> new Color(originalColor.getRed(), originalColor.getGreen(), originalColor.getBlue(), newValue);
+            case "Red" -> new Color(clampedValue, originalColor.getGreen(), originalColor.getBlue());
+            case "Green" -> new Color(originalColor.getRed(), clampedValue, originalColor.getBlue());
+            case "Blue" -> new Color(originalColor.getRed(), originalColor.getGreen(), clampedValue);
+            case "Alpha" -> new Color(originalColor.getRed(), originalColor.getGreen(), originalColor.getBlue(), clampedValue);
             default -> Color.WHITE;
         };
     }
