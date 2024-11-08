@@ -10,6 +10,15 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The ColorPicker class extends RoundedPanel and provides a graphical user interface
+ * component for selecting and modifying colors. It includes input fields for color
+ * components <code style="color:yellow;">(Hex, Red, Green, Blue, Alpha)</code>, a color preview panel, and a color
+ * selector. The class supports various constructors for different corner radius
+ * configurations and allows customization of text field appearance. It also manages
+ * listeners for color picker events, enabling responses to color changes and
+ * transparency adjustments.
+ */
 public class ColorPicker extends RoundedPanel {
 
     private final JTextField[] inputFields = new JTextField[5];
@@ -188,6 +197,13 @@ public class ColorPicker extends RoundedPanel {
         return color;
     }
 
+    /**
+     * Adds a ColorPickerListener to the list of listeners.
+     * The listener will be notified of color picker events such as
+     * color changes, transparency adjustments, and color selections.
+     *
+     * @param listener the ColorPickerListener to be added.
+     */
     @SuppressWarnings("unused")
     public void addColorPickerListener(ColorPickerListener listener) {
         listeners.add(listener);
@@ -198,7 +214,11 @@ public class ColorPicker extends RoundedPanel {
     // ================================== Setters ========================================= //
     // ==================================================================================== //
 
-
+    /**
+     * Sets the font for all JTextFields in the ColorPicker.
+     *
+     * @param font the Font to set for each JTextField.
+     */
     @SuppressWarnings("unused")
     public void setTextFieldFont(Font font) {
         for(JTextField field : inputFields) {
@@ -206,6 +226,11 @@ public class ColorPicker extends RoundedPanel {
         }
     }
 
+    /**
+     * Sets the border for all JTextFields in the ColorPicker.
+     *
+     * @param border the Border to set for each JTextField.
+     */
     @SuppressWarnings("unused")
     public void setTextFieldBorder(Border border) {
         for(JTextField field : inputFields) {
@@ -213,6 +238,11 @@ public class ColorPicker extends RoundedPanel {
         }
     }
 
+    /**
+     * Sets the foreground color for all JTextFields in the ColorPicker.
+     *
+     * @param foregroundColor the Color to set as the foreground for each JTextField.
+     */
     @SuppressWarnings("unused")
     public void setTextFieldForeground(Color foregroundColor) {
         for(JTextField field : inputFields) {
@@ -220,6 +250,11 @@ public class ColorPicker extends RoundedPanel {
         }
     }
 
+    /**
+     * Sets the background color for all JTextFields in the ColorPicker.
+     *
+     * @param backgroundColor the Color to set as the background for each JTextField.
+     */
     @SuppressWarnings("unused")
     public void setTextFieldBackground(Color backgroundColor) {
         for(JTextField field : inputFields) {
@@ -227,6 +262,11 @@ public class ColorPicker extends RoundedPanel {
         }
     }
 
+    /**
+     * Sets the selected color in the ColorSelector component.
+     *
+     * @param color the Color to be set in the ColorSelector.
+     */
     @SuppressWarnings("unused")
     public void setColor(Color color) {
         chooser.setColor(color);
@@ -237,6 +277,15 @@ public class ColorPicker extends RoundedPanel {
     // =========================== Public static Functions ================================ //
     // ==================================================================================== //
 
+    /**
+     * Modifies the specified component of the given color based on the target and value.
+     * If the value cannot be parsed as an integer, defaults to 255.
+     *
+     * @param originalColor the original Color to be modified.
+     * @param target the color component to modify ("Red", "Green", "Blue", or "Alpha").
+     * @param value the new value for the specified component as a String.
+     * @return a new Color object with the modified component, or white if the target is invalid.
+     */
     public static Color modifyColor(Color originalColor, String target, String value) {
         int newValue;
         try {
@@ -248,6 +297,15 @@ public class ColorPicker extends RoundedPanel {
         return modifyColor(originalColor, target, newValue);
     }
 
+    /**
+     * Modifies the specified component of the given color based on the target and value.
+     * If the value cannot be parsed as an integer, defaults to 255.
+     *
+     * @param originalColor the original Color to be modified.
+     * @param target the color component to modify ("Red", "Green", "Blue", or "Alpha").
+     * @param newValue the new value for the specified component.
+     * @return a new Color object with the modified component, or white if the target is invalid.
+     */
     public static Color modifyColor(Color originalColor, String target, int newValue) {
         return switch (target) {
             case "Red" -> new Color(newValue, originalColor.getGreen(), originalColor.getBlue());
@@ -258,11 +316,18 @@ public class ColorPicker extends RoundedPanel {
         };
     }
 
-    public static Color getDarkerColor(Color orginalColor, float factor) {
+    /**
+     * Returns a darker shade of the specified color by applying a factor to its RGB components.
+     *
+     * @param originalColor the original Color to be darkened.
+     * @param factor the factor by which to darken the color, where a value less than 1.0 results in a darker color.
+     * @return a new Color object representing the darker shade of the original color.
+     */
+    public static Color getDarkerColor(Color originalColor, float factor) {
         // Create a new darker color
-        int darkerRed = Math.max((int)(orginalColor.getRed() * factor), 0);
-        int darkerGreen = Math.max((int)(orginalColor.getGreen() * factor), 0);
-        int darkerBlue = Math.max((int)(orginalColor.getBlue() * factor), 0);
+        int darkerRed = Math.max((int)(originalColor.getRed() * factor), 0);
+        int darkerGreen = Math.max((int)(originalColor.getGreen() * factor), 0);
+        int darkerBlue = Math.max((int)(originalColor.getBlue() * factor), 0);
 
         return new Color(darkerRed, darkerGreen, darkerBlue);
     }
@@ -272,15 +337,25 @@ public class ColorPicker extends RoundedPanel {
     // ==================================================================================== //
 
 
+    /**
+     * Retrieves the currently selected color from the ColorSelector.
+     *
+     * @return the current Color selected by the ColorSelector.
+     */
     @SuppressWarnings("unused")
     public Color getColor() {
         return chooser.getColor();
     }
 
+    /**
+     * Calculates and returns the alpha transparency of the currently selected color
+     * as a percentage. The alpha value is normalized from a range of 0-255 to 0-100.
+     *
+     * @return the alpha transparency percentage of the selected color.
+     */
     @SuppressWarnings("unused")
     public int getAlphaPercent() {
-        // TODO: Calculate the percentage from numbers ranging from 0-255
-        return chooser.getColor().getAlpha();
+        return (int)((chooser.getColor().getAlpha() / 255.0) * 100);
     }
 
     /**
